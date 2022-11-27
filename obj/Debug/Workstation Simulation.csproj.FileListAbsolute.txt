@@ -1,0 +1,19 @@
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\bin\Debug\Workstation Simulation.exe.config
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\bin\Debug\Workstation Simulation.exe
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\bin\Debug\Workstation Simulation.pdb
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\bin\Debug\System.Configuration.ConfigurationManager.dll
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\bin\Debug\System.Security.AccessControl.dll
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\bin\Debug\System.Security.Permissions.dll
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\bin\Debug\System.Security.Principal.Windows.dll
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\bin\Debug\System.Configuration.ConfigurationManager.xml
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\bin\Debug\System.Security.AccessControl.xml
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\bin\Debug\System.Security.Permissions.xml
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\bin\Debug\System.Security.Principal.Windows.xml
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\obj\Debug\Workstation Simulation.csprojAssemblyReference.cache
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\obj\Debug\Workstation_Simulation.Form1.resources
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\obj\Debug\Workstation_Simulation.Properties.Resources.resources
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\obj\Debug\Workstation Simulation.csproj.GenerateResource.cache
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\obj\Debug\Workstation Simulation.csproj.CoreCompileInputs.cache
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\obj\Debug\Workstation Simulation.csproj.CopyComplete
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\obj\Debug\Workstation Simulation.exe
+C:\Data\Level9\Advanced SQL\Project\Workstation Simulation\obj\Debug\Workstation Simulation.pdb
