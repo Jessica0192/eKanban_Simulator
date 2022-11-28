@@ -29,6 +29,7 @@ namespace Workstation_Simulation
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.employeeCombo = new System.Windows.Forms.ComboBox();
             this.workstationCombo = new System.Windows.Forms.ComboBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -36,22 +37,24 @@ namespace Workstation_Simulation
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.timeLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // employeeCombo
             // 
             this.employeeCombo.FormattingEnabled = true;
-            this.employeeCombo.Location = new System.Drawing.Point(434, 156);
+            this.employeeCombo.Location = new System.Drawing.Point(396, 158);
             this.employeeCombo.Name = "employeeCombo";
-            this.employeeCombo.Size = new System.Drawing.Size(136, 23);
+            this.employeeCombo.Size = new System.Drawing.Size(237, 23);
             this.employeeCombo.TabIndex = 0;
             // 
             // workstationCombo
             // 
             this.workstationCombo.FormattingEnabled = true;
-            this.workstationCombo.Location = new System.Drawing.Point(434, 193);
+            this.workstationCombo.Location = new System.Drawing.Point(396, 195);
             this.workstationCombo.Name = "workstationCombo";
-            this.workstationCombo.Size = new System.Drawing.Size(136, 23);
+            this.workstationCombo.Size = new System.Drawing.Size(237, 23);
             this.workstationCombo.TabIndex = 1;
             // 
             // button1
@@ -77,7 +80,7 @@ namespace Workstation_Simulation
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(334, 159);
+            this.label1.Location = new System.Drawing.Point(296, 161);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(79, 15);
             this.label1.TabIndex = 4;
@@ -86,7 +89,7 @@ namespace Workstation_Simulation
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(318, 193);
+            this.label2.Location = new System.Drawing.Point(280, 195);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(96, 15);
             this.label2.TabIndex = 5;
@@ -102,11 +105,25 @@ namespace Workstation_Simulation
             this.label3.TabIndex = 6;
             this.label3.Text = "Workstation Simulator";
             // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // timeLabel
+            // 
+            this.timeLabel.AutoSize = true;
+            this.timeLabel.Location = new System.Drawing.Point(13, 13);
+            this.timeLabel.Name = "timeLabel";
+            this.timeLabel.Size = new System.Drawing.Size(51, 15);
+            this.timeLabel.TabIndex = 7;
+            this.timeLabel.Text = "label4";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(900, 450);
+            this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -131,6 +148,8 @@ namespace Workstation_Simulation
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Label timeLabel;
     }
 }
 
