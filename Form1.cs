@@ -1,13 +1,17 @@
-﻿using System;
+﻿/*
+* FILE          : Form1.cs
+* PROJECT       : SENG3070 - Project Kanban
+* PROGRAMMER    : Enes Demirsoz, Jessica Sim, Hoda Akrami
+* FIRST VERSION : 2022-11-24
+* DESCRIPTION:
+*    This file is to allow user to run workstation simulator and selected employee and workstation
+*/
+
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Workstation_Simulation
@@ -15,16 +19,17 @@ namespace Workstation_Simulation
     public partial class Form1 : Form
     {
         private string ConnectionString;
-
-        //config values
-        Dictionary<string, string> configurations;
-        long timeSec, timeMin, timeHours = 0;
-        bool isActive = false;
+        private long timeSec, timeMin, timeHours = 0;
+        private bool isActive = false;
         private long count = 0;
         private int nextTimeSpan;
-        long previousTimeSpan = 0;
-        Employee employee;
-        WorkStation workstation;
+        private long previousTimeSpan = 0;
+        private Employee employee;
+        private WorkStation workstation;
+
+        //config values
+        private Dictionary<string, string> configurations;
+        
 
         public Form1()
         {
@@ -35,6 +40,13 @@ namespace Workstation_Simulation
             GetConfigurationValues();
         }
 
+        /*
+        * FUNCTION : GetConfigurationValues
+        * DESCRIPTION : This method is to get configuration values from configuration table by calling GetDefaultTimeEfficiencyForWorkstation()
+        *               procedure from eKanban database
+        * PARAMETERS : no parameters
+        * RETURNS : void
+        */
         private void GetConfigurationValues()
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
@@ -77,6 +89,15 @@ namespace Workstation_Simulation
             }
         }
 
+        /*
+        * FUNCTION : RunBtn_Click
+        * DESCRIPTION : This method is being called when Run button is clicked from UI side and it calls 
+        *               AssignEmployeeToWorkstation() procedure in eKanban database
+        * PARAMETERS : object sender: the control that the event was fired from
+        *              EventArgs e: represents the base class for classes that contain event data, 
+        *                           and provides a value to use for events that do not include event data.
+        * RETURNS : void
+        */
         private void RunBtn_Click(object sender, EventArgs e)
         {
             employee = employeeCombo.SelectedItem as Employee;
@@ -99,11 +120,21 @@ namespace Workstation_Simulation
             var interval = Convert.ToInt32(timeScale);
 
             isActive = true;
-            timer1.Interval = 1000 / 10;       //interval!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            timer1.Interval = 1000 / interval;
             getTime();
             timer1.Start();
         }
 
+
+        /*
+        * FUNCTION : StopBtn_Click
+        * DESCRIPTION : This method is being called when Stop button is clicked from UI side and it calls 
+        *               ReleaseEmployeeAndWorkstation() procedure in eKanban database to release employee and workstation from list
+        * PARAMETERS : object sender: the control that the event was fired from
+        *              EventArgs e: represents the base class for classes that contain event data, 
+        *                           and provides a value to use for events that do not include event data.
+        * RETURNS : void
+        */
         private void StopBtn_Click(object sender, EventArgs e)
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
@@ -131,6 +162,13 @@ namespace Workstation_Simulation
             timeLabel.Text = timeHours + ":" + timeMin + ":" + timeSec;
         }
 
+        /*
+        * FUNCTION : RetrieveEmployeeWorkstationData
+        * DESCRIPTION : This method is to retrive available employee and workstations by calling GetAvailableEmployee()
+        *               procedure from eKanban database
+        * PARAMETERS : void
+        * RETURNS : void
+        */
         private void RetrieveEmployeeWorkstationData()
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
@@ -180,6 +218,14 @@ namespace Workstation_Simulation
             }
         }
 
+        /*
+        * FUNCTION : timer1_Tick
+        * DESCRIPTION : This method is being called every second and it checks if the time has passed to create new product
+        * PARAMETERS : object sender: the control that the event was fired from
+        *              EventArgs e: represents the base class for classes that contain event data, 
+        *                           and provides a value to use for events that do not include event data.
+        * RETURNS : void
+        */
         private void timer1_Tick(object sender, EventArgs e)
         {
             if (isActive)
@@ -211,6 +257,13 @@ namespace Workstation_Simulation
             timeLabel.Text = timeHours + ":" + timeMin + ":" + timeSec;
         }
 
+        /*
+        * FUNCTION : CreateProduct
+        * DESCRIPTION : This method is to create new product(Fog Lamp) by calling CreateNewProduct()
+        *               procedure from eKanban database
+        * PARAMETERS : void
+        * RETURNS : void
+        */
         private void CreateProduct()
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
@@ -226,6 +279,12 @@ namespace Workstation_Simulation
             }
         }
 
+        /*
+        * FUNCTION : getTime
+        * DESCRIPTION : This method is to set the next time span for creating new product based on the employee's skill level
+        * PARAMETERS : void
+        * RETURNS : void
+        */
         private void getTime()
         {
             configurations.TryGetValue("Base", out string baseNum);

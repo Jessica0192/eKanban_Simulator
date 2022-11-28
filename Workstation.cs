@@ -1,4 +1,13 @@
-﻿using System;
+﻿/*
+* FILE          : Workstation.cs
+* PROJECT       : SENG3070 - Project Kanban
+* PROGRAMMER    : Enes Demirsoz, Jessica Sim, Hoda Akrami
+* FIRST VERSION : 2022-11-24
+* DESCRIPTION:
+*    This file contains Workstation class for the structure of the workstation
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
