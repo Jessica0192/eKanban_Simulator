@@ -120,7 +120,7 @@ namespace Workstation_Simulation
             var interval = Convert.ToInt32(timeScale);
 
             isActive = true;
-            timer1.Interval = 1000 / interval;
+            timer1.Interval = 1000 / 1000;          //interval
             getTime();
             timer1.Start();
         }

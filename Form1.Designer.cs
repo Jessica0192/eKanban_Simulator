@@ -99,7 +99,7 @@ namespace Workstation_Simulation
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Gulim", 30F, System.Drawing.FontStyle.Bold);
-            this.label3.Location = new System.Drawing.Point(187, 62);
+            this.label3.Location = new System.Drawing.Point(203, 69);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(553, 50);
             this.label3.TabIndex = 6;
@@ -114,9 +114,9 @@ namespace Workstation_Simulation
             this.timeLabel.AutoSize = true;
             this.timeLabel.Location = new System.Drawing.Point(13, 13);
             this.timeLabel.Name = "timeLabel";
-            this.timeLabel.Size = new System.Drawing.Size(51, 15);
+            this.timeLabel.Size = new System.Drawing.Size(46, 15);
             this.timeLabel.TabIndex = 7;
-            this.timeLabel.Text = "label4";
+            this.timeLabel.Text = "0:0:0";
             // 
             // Form1
             // 
@@ -133,7 +133,7 @@ namespace Workstation_Simulation
             this.Controls.Add(this.employeeCombo);
             this.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Workstation Simulator";
             this.ResumeLayout(false);
             this.PerformLayout();
 
