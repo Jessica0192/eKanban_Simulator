@@ -28,7 +28,6 @@ C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\bin\Debug\System.Configu
 C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\bin\Debug\System.Security.AccessControl.xml
 C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\bin\Debug\System.Security.Permissions.xml
 C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\bin\Debug\System.Security.Principal.Windows.xml
-C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\obj\Debug\Workstation Simulation.csprojAssemblyReference.cache
 C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\obj\Debug\Workstation_Simulation.Form1.resources
 C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\obj\Debug\Workstation_Simulation.Properties.Resources.resources
 C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\obj\Debug\Workstation Simulation.csproj.GenerateResource.cache
@@ -36,3 +35,5 @@ C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\obj\Debug\Workstation Si
 C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\obj\Debug\Workstation Simulation.csproj.CopyComplete
 C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\obj\Debug\Workstation Simulation.exe
 C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\obj\Debug\Workstation Simulation.pdb
+C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\obj\Debug\Workstation Simulation.csproj.AssemblyReference.cache
+C:\Data\Level9\Advanced SQL\temp\Workstation Simulation\obj\Debug\Workstation Simulation.csproj.SuggestedBindingRedirects.cache

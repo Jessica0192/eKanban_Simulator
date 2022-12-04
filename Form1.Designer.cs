@@ -32,8 +32,8 @@ namespace Workstation_Simulation
             this.components = new System.ComponentModel.Container();
             this.employeeCombo = new System.Windows.Forms.ComboBox();
             this.workstationCombo = new System.Windows.Forms.ComboBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.runBtn = new System.Windows.Forms.Button();
+            this.stopBtn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -48,6 +48,7 @@ namespace Workstation_Simulation
             this.employeeCombo.Name = "employeeCombo";
             this.employeeCombo.Size = new System.Drawing.Size(237, 23);
             this.employeeCombo.TabIndex = 0;
+            this.employeeCombo.MouseClick += new System.Windows.Forms.MouseEventHandler(this.employeeCombo_MouseClick);
             // 
             // workstationCombo
             // 
@@ -56,26 +57,27 @@ namespace Workstation_Simulation
             this.workstationCombo.Name = "workstationCombo";
             this.workstationCombo.Size = new System.Drawing.Size(237, 23);
             this.workstationCombo.TabIndex = 1;
+            this.workstationCombo.MouseClick += new System.Windows.Forms.MouseEventHandler(this.workstationCombo_MouseClick);
             // 
-            // button1
+            // runBtn
             // 
-            this.button1.Location = new System.Drawing.Point(396, 236);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(84, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Run";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.RunBtn_Click);
+            this.runBtn.Location = new System.Drawing.Point(396, 236);
+            this.runBtn.Name = "runBtn";
+            this.runBtn.Size = new System.Drawing.Size(84, 23);
+            this.runBtn.TabIndex = 2;
+            this.runBtn.Text = "Run";
+            this.runBtn.UseVisualStyleBackColor = true;
+            this.runBtn.Click += new System.EventHandler(this.RunBtn_Click);
             // 
-            // button2
+            // stopBtn
             // 
-            this.button2.Location = new System.Drawing.Point(396, 265);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(84, 23);
-            this.button2.TabIndex = 3;
-            this.button2.Text = "Stop";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.StopBtn_Click);
+            this.stopBtn.Location = new System.Drawing.Point(396, 265);
+            this.stopBtn.Name = "stopBtn";
+            this.stopBtn.Size = new System.Drawing.Size(84, 23);
+            this.stopBtn.TabIndex = 3;
+            this.stopBtn.Text = "Stop";
+            this.stopBtn.UseVisualStyleBackColor = true;
+            this.stopBtn.Click += new System.EventHandler(this.StopBtn_Click);
             // 
             // label1
             // 
@@ -127,8 +129,8 @@ namespace Workstation_Simulation
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.stopBtn);
+            this.Controls.Add(this.runBtn);
             this.Controls.Add(this.workstationCombo);
             this.Controls.Add(this.employeeCombo);
             this.Font = new System.Drawing.Font("Gulim", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
@@ -143,8 +145,8 @@ namespace Workstation_Simulation
 
         private System.Windows.Forms.ComboBox employeeCombo;
         private System.Windows.Forms.ComboBox workstationCombo;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button runBtn;
+        private System.Windows.Forms.Button stopBtn;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;

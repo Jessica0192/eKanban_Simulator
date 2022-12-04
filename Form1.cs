@@ -13,6 +13,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace Workstation_Simulation
 {
@@ -36,8 +37,39 @@ namespace Workstation_Simulation
             InitializeComponent();
             ConnectionString = ConfigurationManager.ConnectionStrings["DBConnectionString"]?.ConnectionString;
 
-            RetrieveEmployeeWorkstationData();
             GetConfigurationValues();
+            BeforeRunningSimulation();
+        }
+
+        #region "Methods..."
+        /*
+        * FUNCTION : BeforeRunningSimulation
+        * DESCRIPTION : This method is to set stop button to disable because the simulation hasn't ran yet and enable other controls
+        * PARAMETERS : void
+        * RETURNS : void
+        */
+        private void BeforeRunningSimulation()
+        {
+            runBtn.Enabled = true;
+            stopBtn.Enabled = false;
+
+            employeeCombo.Enabled = true;
+            workstationCombo.Enabled = true;
+        }
+
+        /*
+        * FUNCTION : AfterRunningSimulation
+        * DESCRIPTION : This method is to enable stop button and disable other controls to disable changing information
+        * PARAMETERS : void
+        * RETURNS : void
+        */
+        private void AfterRunningSimulation()
+        {
+            runBtn.Enabled = false;
+            stopBtn.Enabled = true;
+
+            employeeCombo.Enabled = false;
+            workstationCombo.Enabled = false;
         }
 
         /*
@@ -75,17 +107,165 @@ namespace Workstation_Simulation
 
                 sql_cmnd.ExecuteNonQuery();
 
-                configurations = new Dictionary<string, string>();
-                configurations.Add("TimeScale", sql_cmnd.Parameters["@TimeScale"].Value.ToString());
-                configurations.Add("Base", sql_cmnd.Parameters["@Base"].Value.ToString());
-                configurations.Add("BaseDifference",sql_cmnd.Parameters["@BaseDifference"].Value.ToString());
-                configurations.Add("NewEmployee_Efficiency", sql_cmnd.Parameters["@NewEmployee_Efficiency"].Value.ToString());
-                configurations.Add("VeryExperienced_Efficiency",sql_cmnd.Parameters["@VeryExperienced_Efficiency"].Value.ToString());
-                configurations.Add("New/Rookie_Productivity", sql_cmnd.Parameters["@New_Productivity"].Value.ToString());
-                configurations.Add("Experienced/Normal_Productivity", Convert.ToString(sql_cmnd.Parameters["@Experienced_Productivity"].Value));
-                configurations.Add("VeryExperienced/Super_Productivity", Convert.ToString(sql_cmnd.Parameters["@VeryExperienced_Productivity"].Value));
+                configurations = new Dictionary<string, string>
+                {
+                    { "TimeScale", sql_cmnd.Parameters["@TimeScale"].Value.ToString() },
+                    { "Base", sql_cmnd.Parameters["@Base"].Value.ToString() },
+                    { "BaseDifference", sql_cmnd.Parameters["@BaseDifference"].Value.ToString() },
+                    { "NewEmployee_Efficiency", sql_cmnd.Parameters["@NewEmployee_Efficiency"].Value.ToString() },
+                    { "VeryExperienced_Efficiency", sql_cmnd.Parameters["@VeryExperienced_Efficiency"].Value.ToString() },
+                    { "New/Rookie_Productivity", sql_cmnd.Parameters["@New_Productivity"].Value.ToString() },
+                    { "Experienced/Normal_Productivity", Convert.ToString(sql_cmnd.Parameters["@Experienced_Productivity"].Value) },
+                    { "VeryExperienced/Super_Productivity", Convert.ToString(sql_cmnd.Parameters["@VeryExperienced_Productivity"].Value) }
+                };
 
                 connection.Close();
+            }
+        }
+
+
+        /*
+        * FUNCTION : CreateProduct
+        * DESCRIPTION : This method is to create new product(Fog Lamp) by calling CreateNewProduct()
+        *               procedure from eKanban database
+        * PARAMETERS : void
+        * RETURNS : void
+        */
+        private void CreateProduct()
+        {
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand sql_cmnd = new SqlCommand("CreateNewProduct", connection);
+                sql_cmnd.CommandType = CommandType.StoredProcedure;
+
+                sql_cmnd.Parameters.AddWithValue("@WorkstationID", SqlDbType.Int).Value = workstation.ID;
+                sql_cmnd.ExecuteNonQuery();
+
+                connection.Close();
+            }
+        }
+
+        /*
+        * FUNCTION : GetTime
+        * DESCRIPTION : This method is to set the next time span for creating new product based on the employee's skill level
+        * PARAMETERS : void
+        * RETURNS : void
+        */
+        private void GetTime()
+        {
+            configurations.TryGetValue("Base", out string baseNum);
+            configurations.TryGetValue("BaseDifference", out string baseDifference);
+
+            float min = Convert.ToInt32(baseNum) - Convert.ToInt32(baseNum) * float.Parse(baseDifference);
+            float max = Convert.ToInt32(baseNum) + Convert.ToInt32(baseNum) * float.Parse(baseDifference);
+
+            var random = new Random();
+            var tmp = random.Next(Convert.ToInt32(min), Convert.ToInt32(max) + 1);
+
+            switch (employee.Level)
+            {
+                case "New Employee":
+                    configurations.TryGetValue("NewEmployee_Efficiency", out string efficiency);
+                    var numPercentage = Convert.ToDouble(efficiency.Substring(1, efficiency.Length - 2));
+                    numPercentage = numPercentage * 0.01;
+                    tmp = Convert.ToInt32(tmp + (tmp * numPercentage));
+
+                    break;
+                case "Very Experienced":
+                    configurations.TryGetValue("VeryExperienced_Efficiency", out string veryEfficiency);
+                    var num = Convert.ToDouble(veryEfficiency.Substring(1, veryEfficiency.Length - 2));
+                    num = num * 0.01;
+                    tmp = Convert.ToInt32(tmp - (tmp * num));
+                    break;
+            }
+
+            nextTimeSpan = tmp;
+        }
+        #endregion
+
+
+        #region "Events..."
+        /*
+        * FUNCTION : employeeCombo_MouseClick
+        * DESCRIPTION : This method is being called when employee dropdown is clicked from UI side and it calls 
+        *               GetAvailableEmployee() procedure in eKanban database
+        * PARAMETERS : object sender: the control that the event was fired from
+        *              EventArgs e: represents the base class for classes that contain event data, 
+        *                           and provides a value to use for events that do not include event data.
+        * RETURNS : void
+        */
+        private void employeeCombo_MouseClick(object sender, MouseEventArgs e)
+        {
+            employeeCombo.Items.Clear();
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                try
+                {
+                    using (SqlDataAdapter da = new SqlDataAdapter())
+                    {
+                        da.SelectCommand = new SqlCommand("GetAvailableEmployee", connection);
+                        da.SelectCommand.CommandType = CommandType.StoredProcedure;
+
+                        DataSet ds = new DataSet();
+                        da.Fill(ds, "result_name");
+
+                        DataTable dt = ds.Tables["result_name"];
+
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            //manipulate your data
+                            var emp = new Employee() { ID = Int32.Parse(row[0].ToString()), Name = row[1].ToString(), Level = row[2].ToString() };
+                            employeeCombo.Items.Add(emp);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message);
+                }
+            }
+        }
+
+        /*
+        * FUNCTION : workstationCombo_MouseClick
+        * DESCRIPTION : This method is being called when workstation dropdown is clicked from UI side and it calls 
+        *               GetAvailableWorkstations() procedure in eKanban database
+        * PARAMETERS : object sender: the control that the event was fired from
+        *              MouseEventArgs e: represents the base class for classes that contain event data, 
+        *                           and provides a value to use for events that do not include event data.
+        * RETURNS : void
+        */
+        private void workstationCombo_MouseClick(object sender, MouseEventArgs e)
+        {
+            workstationCombo.Items.Clear();
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                try
+                {
+
+                    using (SqlDataAdapter da = new SqlDataAdapter())
+                    {
+                        da.SelectCommand = new SqlCommand("GetAvailableWorkstations", connection);
+                        da.SelectCommand.CommandType = CommandType.StoredProcedure;
+
+                        DataSet ds = new DataSet();
+                        da.Fill(ds, "result_name");
+
+                        DataTable dt = ds.Tables["result_name"];
+
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            //manipulate your data
+                            var ws = new WorkStation() { ID = Int32.Parse(row[0].ToString()), Name = row[1].ToString() };
+                            workstationCombo.Items.Add(ws);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message);
+                }
             }
         }
 
@@ -100,11 +280,55 @@ namespace Workstation_Simulation
         */
         private void RunBtn_Click(object sender, EventArgs e)
         {
+            List<Employee> availableEmployee = new List<Employee>();
+            List<WorkStation> availableWorkstations = new List<WorkStation>();
             employee = employeeCombo.SelectedItem as Employee;
             workstation = workstationCombo.SelectedItem as WorkStation;
 
+
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
+                using (SqlDataAdapter da = new SqlDataAdapter())
+                {
+                    da.SelectCommand = new SqlCommand("GetAvailableEmployee", connection);
+                    da.SelectCommand.CommandType = CommandType.StoredProcedure;
+
+                    DataSet ds = new DataSet();
+                    da.Fill(ds, "result_name");
+                    DataTable dt = ds.Tables["result_name"];
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        //manipulate your data
+                        availableEmployee.Add(new Employee() { ID = Int32.Parse(row[0].ToString()), Name = row[1].ToString(), Level = row[2].ToString() });
+                    }
+
+                    if(availableEmployee.Find(x => x.Name == employee.Name) == null)
+                    {
+                        MessageBox.Show("Please select different employee from options", "Can't assign selected employee", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        return;
+                    }
+
+                    da.SelectCommand = new SqlCommand("GetAvailableWorkstations", connection);
+                    da.SelectCommand.CommandType = CommandType.StoredProcedure;
+
+                    ds = new DataSet();
+                    da.Fill(ds, "result_name");
+                    dt = ds.Tables["result_name"];
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        //manipulate your data
+                        availableWorkstations.Add(new WorkStation() { ID = Int32.Parse(row[0].ToString()), Name = row[1].ToString() });
+                    }
+
+                    if (availableWorkstations.Find(x => x.Name == workstation.Name) == null)
+                    {
+                        MessageBox.Show("Please select different workstation from options", "Can't assign selected workstation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        return;
+                    }
+                }
+
                 connection.Open();
                 SqlCommand sql_cmnd = new SqlCommand("AssignEmployeeToWorkstation", connection);
                 sql_cmnd.CommandType = CommandType.StoredProcedure;
@@ -121,8 +345,10 @@ namespace Workstation_Simulation
 
             isActive = true;
             timer1.Interval = 1000 / interval;
-            getTime();
+            GetTime();
             timer1.Start();
+
+            AfterRunningSimulation();
         }
 
 
@@ -152,70 +378,16 @@ namespace Workstation_Simulation
 
             timer1.Stop();
 
-            employeeCombo.Items.Clear();
-            workstationCombo.Items.Clear();
-            RetrieveEmployeeWorkstationData();
+            //employeeCombo.Items.Clear();
+            //workstationCombo.Items.Clear();
+            //RetrieveEmployeeWorkstationData();
 
             timeSec = 0;
             timeMin = 0;
             timeHours = 0;
             timeLabel.Text = timeHours + ":" + timeMin + ":" + timeSec;
-        }
 
-        /*
-        * FUNCTION : RetrieveEmployeeWorkstationData
-        * DESCRIPTION : This method is to retrive available employee and workstations by calling GetAvailableEmployee()
-        *               procedure from eKanban database
-        * PARAMETERS : void
-        * RETURNS : void
-        */
-        private void RetrieveEmployeeWorkstationData()
-        {
-            using (SqlConnection connection = new SqlConnection(ConnectionString))
-            {
-                try
-                {
-                    using (SqlDataAdapter da = new SqlDataAdapter())
-                    {
-                        da.SelectCommand = new SqlCommand("GetAvailableEmployee", connection);
-                        da.SelectCommand.CommandType = CommandType.StoredProcedure;
-
-                        DataSet ds = new DataSet();
-                        da.Fill(ds, "result_name");
-
-                        DataTable dt = ds.Tables["result_name"];
-
-                        foreach (DataRow row in dt.Rows)
-                        {
-                            //manipulate your data
-                            var emp = new Employee() { ID = Int32.Parse(row[0].ToString()), Name = row[1].ToString(), Level = row[2].ToString() };
-                            employeeCombo.Items.Add(emp);
-                        }
-                    }
-
-                    using (SqlDataAdapter da = new SqlDataAdapter())
-                    {
-                        da.SelectCommand = new SqlCommand("GetAvailableWorkstations", connection);
-                        da.SelectCommand.CommandType = CommandType.StoredProcedure;
-
-                        DataSet ds = new DataSet();
-                        da.Fill(ds, "result_name");
-
-                        DataTable dt = ds.Tables["result_name"];
-
-                        foreach (DataRow row in dt.Rows)
-                        {
-                            //manipulate your data
-                            var ws = new WorkStation() { ID = Int32.Parse(row[0].ToString()), Name = row[1].ToString() };
-                            workstationCombo.Items.Add(ws);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Error: " + e.Message);
-                }
-            }
+            BeforeRunningSimulation();
         }
 
         /*
@@ -250,70 +422,13 @@ namespace Workstation_Simulation
                     previousTimeSpan = count;
                     //create product
                     CreateProduct();
-                    getTime();
+                    GetTime();
                 }
             }
             
             timeLabel.Text = timeHours + ":" + timeMin + ":" + timeSec;
         }
+        #endregion
 
-        /*
-        * FUNCTION : CreateProduct
-        * DESCRIPTION : This method is to create new product(Fog Lamp) by calling CreateNewProduct()
-        *               procedure from eKanban database
-        * PARAMETERS : void
-        * RETURNS : void
-        */
-        private void CreateProduct()
-        {
-            using (SqlConnection connection = new SqlConnection(ConnectionString))
-            {
-                connection.Open();
-                SqlCommand sql_cmnd = new SqlCommand("CreateNewProduct", connection);
-                sql_cmnd.CommandType = CommandType.StoredProcedure;
-
-                sql_cmnd.Parameters.AddWithValue("@WorkstationID", SqlDbType.Int).Value = workstation.ID;
-                sql_cmnd.ExecuteNonQuery();
-
-                connection.Close();
-            }
-        }
-
-        /*
-        * FUNCTION : getTime
-        * DESCRIPTION : This method is to set the next time span for creating new product based on the employee's skill level
-        * PARAMETERS : void
-        * RETURNS : void
-        */
-        private void getTime()
-        {
-            configurations.TryGetValue("Base", out string baseNum);
-            configurations.TryGetValue("BaseDifference", out string baseDifference);
-
-            float min = Convert.ToInt32(baseNum) - Convert.ToInt32(baseNum) * float.Parse(baseDifference);
-            float max = Convert.ToInt32(baseNum) + Convert.ToInt32(baseNum) * float.Parse(baseDifference);
-
-            var random = new Random();
-            var tmp = random.Next(Convert.ToInt32(min), Convert.ToInt32(max) + 1);
-
-            switch(employee.Level)
-            {
-                case "New Employee":
-                    configurations.TryGetValue("NewEmployee_Efficiency", out string efficiency);
-                    var numPercentage = Convert.ToDouble(efficiency.Substring(1, efficiency.Length - 2));
-                    numPercentage = numPercentage * 0.01;
-                    tmp = Convert.ToInt32(tmp + (tmp * numPercentage));
-
-                    break;
-                case "Very Experienced":
-                    configurations.TryGetValue("VeryExperienced_Efficiency", out string veryEfficiency);
-                    var num = Convert.ToDouble(veryEfficiency.Substring(1, veryEfficiency.Length - 2));
-                    num = num * 0.01;
-                    tmp = Convert.ToInt32(tmp - (tmp * num));
-                    break;
-            }
-
-            nextTimeSpan = tmp;
-        }
     }
 }
