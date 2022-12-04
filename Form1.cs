@@ -343,6 +343,11 @@ namespace Workstation_Simulation
             configurations.TryGetValue("TimeScale", out string timeScale);
             var interval = Convert.ToInt32(timeScale);
 
+            timeSec = 0;
+            timeMin = 0;
+            timeHours = 0;
+            timeLabel.Text = timeHours + ":" + timeMin + ":" + timeSec;
+
             isActive = true;
             timer1.Interval = 1000 / interval;
             GetTime();
@@ -377,15 +382,6 @@ namespace Workstation_Simulation
             }
 
             timer1.Stop();
-
-            //employeeCombo.Items.Clear();
-            //workstationCombo.Items.Clear();
-            //RetrieveEmployeeWorkstationData();
-
-            timeSec = 0;
-            timeMin = 0;
-            timeHours = 0;
-            timeLabel.Text = timeHours + ":" + timeMin + ":" + timeSec;
 
             BeforeRunningSimulation();
         }
