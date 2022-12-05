@@ -182,6 +182,28 @@ namespace Workstation_Simulation
 
             nextTimeSpan = tmp;
         }
+
+        /*
+        * FUNCTION : ReleaseWorkstationAndEmployee
+        * DESCRIPTION : This method releases workstation and employee by calling ReleaseEmployeeAndWorkstation stored procedure
+        * PARAMETERS : void
+        * RETURNS : void
+        */
+        private void ReleaseWorkstationAndEmployee()
+        {
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand sql_cmnd = new SqlCommand("ReleaseEmployeeAndWorkstation", connection);
+                sql_cmnd.CommandType = CommandType.StoredProcedure;
+
+                sql_cmnd.Parameters.AddWithValue("@WorkstationID", SqlDbType.Int).Value = workstation.ID;
+                sql_cmnd.Parameters.AddWithValue("@EmployeeId", SqlDbType.Int).Value = employee.ID;
+                sql_cmnd.ExecuteNonQuery();
+
+                connection.Close();
+            }
+        }
         #endregion
 
 
@@ -356,6 +378,11 @@ namespace Workstation_Simulation
             AfterRunningSimulation();
         }
 
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            ReleaseWorkstationAndEmployee();
+        }
+
 
         /*
         * FUNCTION : StopBtn_Click
@@ -368,24 +395,12 @@ namespace Workstation_Simulation
         */
         private void StopBtn_Click(object sender, EventArgs e)
         {
-            using (SqlConnection connection = new SqlConnection(ConnectionString))
-            {
-                connection.Open();
-                SqlCommand sql_cmnd = new SqlCommand("ReleaseEmployeeAndWorkstation", connection);
-                sql_cmnd.CommandType = CommandType.StoredProcedure;
-
-                sql_cmnd.Parameters.AddWithValue("@WorkstationID", SqlDbType.Int).Value = workstation.ID;
-                sql_cmnd.Parameters.AddWithValue("@EmployeeId", SqlDbType.Int).Value = employee.ID;
-                sql_cmnd.ExecuteNonQuery();
-
-                connection.Close();
-            }
-
+            ReleaseWorkstationAndEmployee();
             timer1.Stop();
-
             BeforeRunningSimulation();
         }
 
+        
         /*
         * FUNCTION : timer1_Tick
         * DESCRIPTION : This method is being called every second and it checks if the time has passed to create new product
